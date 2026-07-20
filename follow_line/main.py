@@ -1,4 +1,5 @@
 from openrdk import CommsRuntime
+from openrdk import Motors
 from odometria import Odometry
 from pid import PID
 import time
@@ -11,15 +12,17 @@ runtime = CommsRuntime(
     enable_webview_updates=True,
 )
 
-motor_right = runtime.traction(serial_number)
-motor_left = runtime.traction(serial_number)
+motor_r = runtime.traction(serial_number)
+motor_l = runtime.traction(serial_number)
 line_sensor = runtime.line_sensor(serial_number)
+
+motores = Motors(right = motor_r, left = motor_l)
 
 pid = PID()
 odometry = Odometry()
 
 while True:
-    reading = line_sensor.get_position()
+    reading = line_sensor.get_data()
     position = reading["position"]
     correction = pid.calculate(position)
 
@@ -29,7 +32,7 @@ while True:
     left_speed = max(-100, min(100, left_speed))
     right_speed = max(-100, min(100, right_speed))
 
-    motor_right.move(right_speed)
-    motor_left.move(left_speed)
+    motores.right.move(right_speed)
+    motores.left.move(left_speed)
 
     time.sleep(0.01)
