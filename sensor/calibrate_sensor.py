@@ -2,7 +2,7 @@ from openrdk import CommsRuntime
 
 runtime = CommsRuntime(auto_start=True)
 
-line_sensor = runtime.line_sensor("serial_number")
+line_sensor = runtime.line_sensor("10:20:BA:AC:F4:B0")
 
 line_sensor.set_track_type("dark")
 
