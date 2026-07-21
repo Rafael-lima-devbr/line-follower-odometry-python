@@ -3,7 +3,7 @@ import time
 
 runtime = CommsRuntime(auto_start=True)
 
-line_sensor = runtime.line_sensor("serial_number")
+line_sensor = runtime.line_sensor("10:20:BA:AC:F4:B0")
 
 while True:
     reading = line_sensor.get_data()
