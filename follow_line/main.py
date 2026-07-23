@@ -1,6 +1,6 @@
 from openrdk import CommsRuntime
 from openrdk import Motors
-from odometria import Odometry
+from odometry import Odometry
 from pid import PID
 import time
 
