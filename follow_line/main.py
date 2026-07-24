@@ -16,10 +16,6 @@ motor_r = runtime.traction("98:3D:AE:43:50:50")
 motor_l = runtime.traction("10:20:BA:AA:E7:28")
 line_sensor = runtime.line_sensor("10:20:BA:AC:F4:B0")
 
-line_sensor.set_track_type("dark")
-line_sensor.set_digital_threshold(0.5)
-line_sensor.set_detect_threshold(0.2)
-
 motores = Motors(right = motor_r, left = motor_l)
 
 pid = PID()
