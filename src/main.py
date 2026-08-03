@@ -1,7 +1,18 @@
 from openrdk import CommsRuntime
 from openrdk import Motors
-from odometry import Odometry
+from odometria import Odometry
 from pid import PID
+from line_functions import (
+    is_clear_intersection,
+    is_left_90_candidate,
+    is_right_90_candidate,
+    is_gap,
+    handle_left_candidate,
+    handle_right_candidate,
+    handle_intersection,
+    handle_gap,
+    follow_line,
+)
 import time
 
 base_speed = 50
@@ -16,23 +27,35 @@ motor_r = runtime.traction("98:3D:AE:43:50:50")
 motor_l = runtime.traction("10:20:BA:AA:E7:28")
 line_sensor = runtime.line_sensor("10:20:BA:AC:F4:B0")
 
-motores = Motors(right = motor_r, left = motor_l)
+motors = Motors(right = motor_r, left = motor_l)
 
 pid = PID()
 odometry = Odometry()
 
-while True:
-    reading = line_sensor.get_data()
-    position = reading["position"]
-    correction = pid.calculate(position)
+try:
+    while True:
+        reading = line_sensor.get_data()
+        digital = reading["digital"]
 
-    left_speed = base_speed + correction
-    right_speed = base_speed - correction
+        if is_clear_intersection(digital):
+            handle_intersection(motors)
+            continue
 
-    left_speed = max(-100, min(100, left_speed))
-    right_speed = max(-100, min(100, right_speed))
+        if is_left_90_candidate(digital):
+            handle_left_candidate(motors, line_sensor)
+            continue
 
-    motores.right.move(right_speed)
-    motores.left.move(left_speed)
+        if is_right_90_candidate(digital):
+            handle_right_candidate(motors, line_sensor)
+            continue
 
-    time.sleep(0.01)
+        if is_gap(reading):
+            handle_gap(motors)
+            continue
+
+        follow_line(reading, motors, pid, base_speed)
+
+        time.sleep(0.01)
+
+finally:
+    motors.stop()
