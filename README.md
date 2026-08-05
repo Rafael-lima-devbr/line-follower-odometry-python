@@ -73,7 +73,7 @@ Used to test sensor readings separately from the main robot program.
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/follow-line.git
+git clone https://github.com/Rafael-lima-devbr/line-follower-odometry-python.git
 ```
 
 Enter the project folder:
