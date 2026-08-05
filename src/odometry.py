@@ -30,10 +30,12 @@ class Odometry:
         theta_mid = self.theta + delta_theta/2
 
         delta_x = d_avg * math.cos(theta_mid)
-        delta_y = d_avg * math.sen(theta_mid)
+        delta_y = d_avg * math.sin(theta_mid)
 
         self.x += delta_x
         self.y += delta_y
+        self.last_left_deg = left_deg
+        self.last_right_deg = right_deg
         self.theta += delta_theta
         self.theta = math.atan2(math.sin(self.theta), math.cos(self.theta))
 
@@ -51,3 +53,14 @@ class Odometry:
         self.theta = 0
         self.last_right_deg = None
         self.last_left_deg = None
+
+    def angle_difference_rad(self, current_angle, start_angle):
+        difference = current_angle - start_angle
+
+        while difference > math.pi:
+            difference -= 2 * math.pi
+
+        while difference < -math.pi:
+            difference += 2 * math.pi
+
+        return difference
