@@ -1,7 +1,14 @@
 import time
+import math
 
 def is_clear_intersection(digital):
     return all(digital)
+
+def line_found(line_sensor):
+    reading = line_sensor.get_data()
+    digital = reading["digital"]
+
+    return reading["line_detected"] or any(digital)
 
 
 def is_left_90_candidate(digital):
@@ -15,83 +22,106 @@ def is_right_90_candidate(digital):
 def is_gap(reading):
     return not reading["line_detected"]
 
+def update_odometry_motors(odometry, motors):
+    right_deg = motors.right.get_position_telemetry()
+    left_deg = motors.left.get_position_telemetry()
 
-def center_stays_on_line_during_short_forward(motors, line_sensor):
+    odometry.update(right_deg, left_deg)
+
+def turn_right(motors, odometry, target_angle_rad):
+    update_odometry_motors(odometry, motors)
+    start_theta = odometry.theta
+
+    while True:
+        motors.left.move(30)
+        motors.right.move(-30)
+
+        update_odometry_motors(odometry, motors)
+
+        turned_angle = odometry.angle_difference(odometry.theta, start_theta)
+
+        if turned_angle >= target_angle_rad:
+            break
+
+        time.sleep(0.01)
+
+    motors.stop()
+
+def turn_left(motors, odometry, target_angle_rad):
+    update_odometry_motors(odometry, motors)
+    start_theta = odometry.theta
+
+    while True:
+        motors.left.move(-30)
+        motors.right.move(30)
+
+        update_odometry_motors(odometry, motors)
+
+        turned_angle = odometry.angle_difference(odometry.theta, start_theta)
+
+        if turned_angle <= -target_angle_rad:
+            break
+
+        time.sleep(0.01)
+
+    motors.stop()
+
+def move_straight_for(motors, odometry, duration, speed):
+    start_time = time.monotonic()
+
+    while time.monotonic() - start_time < duration:
+        motors.left.move(speed)
+        motors.right.move(speed)
+
+        update_odometry_motors(odometry, motors)
+
+        time.sleep(0.01)
+
+    motors.stop()
+
+
+def center_stays_on_line_during_short_forward(motors, line_sensor, odometry):
     start_time = time.monotonic()
 
     while time.monotonic() - start_time < 0.25:
         motors.left.move(30)
         motors.right.move(30)
 
+        update_odometry_motors(odometry, motors)
+
         reading = line_sensor.get_data()
         digital = reading["digital"]
 
         if not digital[2]:
+            motors.stop()
             return False
 
         time.sleep(0.01)
 
+    motors.stop()
     return True
 
 
-def handle_left_90(motors, line_sensor):
-    center_count = 0
-
-    while center_count < 3:
-        motors.left.move(-30)
-        motors.right.move(40)
-
-        reading = line_sensor.get_data()
-        digital = reading["digital"]
-
-        if digital[2]:
-            center_count += 1
-        else:
-            center_count = 0
-
-        time.sleep(0.01)
+def handle_intersection(motors, odometry):
+    move_straight_for(motors, odometry, 0.4, 35)
 
 
-def handle_right_90(motors, line_sensor):
-    center_count = 0
-
-    while center_count < 3:
-        motors.left.move(40)
-        motors.right.move(-30)
-
-        reading = line_sensor.get_data()
-        digital = reading["digital"]
-
-        if digital[2]:
-            center_count += 1
-        else:
-            center_count = 0
-
-        time.sleep(0.01)
-
-
-def handle_intersection(motors):
-    motors.left.move(35)
-    motors.right.move(35)
-    time.sleep(0.4)
-
-
-def handle_left_candidate(motors, line_sensor):
-    center_stayed = center_stays_on_line_during_short_forward(motors, line_sensor)
+def handle_left_candidate(motors, line_sensor, odometry):
+    center_stayed = center_stays_on_line_during_short_forward(motors, line_sensor, odometry)
 
     if center_stayed:
-        handle_intersection(motors)
+        handle_intersection(motors, odometry)
     else:
-        handle_left_90(motors, line_sensor)
+        turn_left(motors, odometry, math.radians(90))
 
 
-def handle_right_candidate(motors, line_sensor):
-    center_stayed = center_stays_on_line_during_short_forward(motors, line_sensor)
+def handle_right_candidate(motors, line_sensor, odometry):
+    center_stayed = center_stays_on_line_during_short_forward(motors, line_sensor, odometry)
 
     if center_stayed:
-        handle_intersection(motors)
+        handle_intersection(motors, odometry)
     else:
-        handle_right_90(motors, line_sensor)
+        turn_right(motors, odometry, math.radians(90))
 
 
 def follow_line(reading, motors, pid, base_speed):
@@ -109,7 +139,98 @@ def follow_line(reading, motors, pid, base_speed):
     motors.right.move(right_speed)
 
 
-def handle_gap(motors):
-    motors.left.move(30)
-    motors.right.move(30)
+def try_cross_gap(motors, line_sensor, odometry):
+    start_time = time.monotonic()
+
+    while time.monotonic() - start_time < 3.0:
+        motors.left.move(30)
+        motors.right.move(30)
+
+        update_odometry_motors(odometry, motors)
+
+        reading = line_sensor.get_data()
+
+        if reading["line_detected"]:
+            motors.stop()
+            return True
+
+        time.sleep(0.01)
+
+    forward_time = time.monotonic() - start_time
+
+    move_straight_for(motors, odometry, forward_time, -30)
+    return False
+
+def is_obstacle(distance_sensor):
+    distance = distance_sensor.get_distance_cm()
+
+    if distance is None:
+        return False
+
+    return distance < 15
+
+def handle_lost_line(motors, line_sensor, last_position, odometry):
+    center_count = 0
+
+    if last_position < 0:
+        left_speed = 15
+        right_speed = 30
+    else:
+        left_speed = 30
+        right_speed = 15
+
+    while True:
+        motors.left.move(left_speed)
+        motors.right.move(right_speed)
+        
+        update_odometry_motors(odometry, motors)
+
+        reading = line_sensor.get_data()
+        digital = reading["digital"]
+
+        if reading["line_detected"] and digital[2]:
+            center_count += 1
+        else:
+            center_count = 0
+
+        if center_count >= 3:
+            motors.stop()
+            return True
+
+        time.sleep(0.01)
+
+def handle_obstacle(motors, line_sensor, odometry):
+    motors.stop()
+    time.sleep(0.2)
+
+#counterclockwise
+
+    turn_right(motors, odometry, math.radians(90))
+    move_straight_for(motors, odometry, 0.35, 30)
+
+    turn_left(motors, odometry, math.radians(90))
+    move_straight_for(motors, odometry, 0.45, 30)
+
+    turn_right(motors, odometry, math.radians(90))
     time.sleep(0.1)
+
+    if line_found(line_sensor):
+        return True
+
+    attempts = 0
+    while attempts < 2:
+        turn_left(motors, odometry, math.radians(90))
+        move_straight_for(motors, odometry, 0.35, 30)
+
+        turn_left(motors, odometry, math.radians(90))
+        move_straight_for(motors, odometry, 0.45, 30)
+
+        turn_right(motors, odometry, math.radians(90))
+        time.sleep(0.1)
+
+        if line_found(line_sensor):
+            return True
+
+        attempts += 1
+
+    return False
