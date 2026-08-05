@@ -31,7 +31,8 @@ runtime = CommsRuntime(
 motor_r = runtime.traction("98:3D:AE:43:50:50")
 motor_l = runtime.traction("10:20:BA:AA:E7:28")
 line_sensor = runtime.line_sensor("10:20:BA:AC:F4:B0")
-distance_sensor = runtime.distance_sensor("SERIAL_DO_SENSOR_DISTANCIA")
+distance_sensor = runtime.distance_sensor("7C:4F:AD:79:B0:44")
+color_sensor = runtime.color_sensor("7C:4F:AD:79:94:B0")
 
 motors = Motors(right = motor_r, left = motor_l)
 
