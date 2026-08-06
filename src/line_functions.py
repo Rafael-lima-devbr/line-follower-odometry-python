@@ -70,8 +70,7 @@ def move_straight_for(motors, odometry, duration, speed):
     start_time = time.monotonic()
 
     while time.monotonic() - start_time < duration:
-        motors.left.move(speed)
-        motors.right.move(speed)
+        motors.move(speed)
 
         update_odometry_motors(odometry, motors)
 
@@ -84,8 +83,7 @@ def center_stays_on_line_during_short_forward(motors, line_sensor, odometry):
     start_time = time.monotonic()
 
     while time.monotonic() - start_time < 0.25:
-        motors.left.move(30)
-        motors.right.move(30)
+        motors.move(30)
 
         update_odometry_motors(odometry, motors)
 
@@ -143,8 +141,7 @@ def try_cross_gap(motors, line_sensor, odometry):
     start_time = time.monotonic()
 
     while time.monotonic() - start_time < 3.0:
-        motors.left.move(30)
-        motors.right.move(30)
+        motors.move(30)
 
         update_odometry_motors(odometry, motors)
 
