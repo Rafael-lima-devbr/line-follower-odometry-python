@@ -19,7 +19,7 @@ from line_functions import (
 )
 import time
 
-base_speed = 50
+base_speed = 30
 last_position = 0
 
 runtime = CommsRuntime(
