@@ -4,13 +4,6 @@ import math
 def is_clear_intersection(digital):
     return all(digital)
 
-def line_found(line_sensor):
-    reading = line_sensor.get_data()
-    digital = reading["digital"]
-
-    return reading["line_detected"] or any(digital)
-
-
 def is_left_90_candidate(digital):
     return digital[0] and digital[1] and not digital[3] and not digital[4]
 
@@ -200,34 +193,16 @@ def handle_obstacle(motors, line_sensor, odometry):
     motors.stop()
     time.sleep(0.2)
 
-#counterclockwise
+    move_straight_for(motors, odometry, 0,15, -20)
 
     turn_right(motors, odometry, math.radians(90))
-    move_straight_for(motors, odometry, 0.35, 30)
+    move_straight_for(motors, odometry, 0.45, 30)
+
+    turn_left(motors, odometry, math.radians(90))
+    move_straight_for(motors, odometry, 0.50, 30)
 
     turn_left(motors, odometry, math.radians(90))
     move_straight_for(motors, odometry, 0.45, 30)
 
     turn_right(motors, odometry, math.radians(90))
     time.sleep(0.1)
-
-    if line_found(line_sensor):
-        return True
-
-    attempts = 0
-    while attempts < 2:
-        turn_left(motors, odometry, math.radians(90))
-        move_straight_for(motors, odometry, 0.35, 30)
-
-        turn_left(motors, odometry, math.radians(90))
-        move_straight_for(motors, odometry, 0.45, 30)
-
-        turn_right(motors, odometry, math.radians(90))
-        time.sleep(0.1)
-
-        if line_found(line_sensor):
-            return True
-
-        attempts += 1
-
-    return False
