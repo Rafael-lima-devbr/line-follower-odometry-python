@@ -193,7 +193,7 @@ def handle_obstacle(motors, line_sensor, odometry):
     motors.stop()
     time.sleep(0.2)
 
-    move_straight_for(motors, odometry, 0,15, -20)
+    move_straight_for(motors, odometry, 0.15, -20)
 
     turn_right(motors, odometry, math.radians(90))
     move_straight_for(motors, odometry, 0.45, 30)
