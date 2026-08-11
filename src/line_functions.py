@@ -94,7 +94,7 @@ def center_stays_on_line_during_short_forward(motors, line_sensor, odometry):
 
 
 def handle_intersection(motors, odometry):
-    move_straight_for(motors, odometry, 0.4, 35)
+    move_straight_for(motors, odometry, 0.35, 35)
 
 
 def handle_left_candidate(motors, line_sensor, odometry):
@@ -123,8 +123,8 @@ def follow_line(reading, motors, pid, base_speed):
     left_speed = base_speed - correction
     right_speed = base_speed + correction
 
-    left_speed = max(-100, min(100, left_speed))
-    right_speed = max(-100, min(100, right_speed))
+    left_speed = max(-40, min(40, left_speed))
+    right_speed = max(-40, min(40, right_speed))
 
     motors.left.move(left_speed)
     motors.right.move(right_speed)
