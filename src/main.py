@@ -8,8 +8,14 @@ from line_functions import (
     is_right_90_candidate,
     is_gap,
     is_obstacle,
+    is_180,
+    is_color_90_left,
+    is_color_90_right,
     handle_left_candidate,
     handle_right_candidate,
+    handle_color_90_left,
+    handle_color_90_right,
+    handle_180,
     handle_intersection,
     handle_lost_line,
     handle_obstacle,
@@ -42,7 +48,7 @@ odometry = Odometry()
 
 try:
     while True:
-        reading = line_sensor.get_position()
+        reading = line_sensor.get_data()
         color_r = color_sensor_r.get_color()
         color_l = color_sensor_l.get_color()
         update_odometry_motors(odometry, motors)
@@ -53,7 +59,19 @@ try:
         digital = reading["digital"]
 
         if is_obstacle(distance_sensor):
-            handle_obstacle(motors, line_sensor, odometry)
+            handle_obstacle(motors, odometry)
+            continue
+        
+        if is_180(color_r, color_l):
+            handle_180(motors, odometry)
+            continue
+        
+        if is_color_90_left(color_r, color_l):
+            handle_color_90_left(motors, odometry)
+            continue
+        
+        if is_color_90_right(color_r, color_l):
+            handle_color_90_right(motors, odometry)
             continue
 
         if is_clear_intersection(digital):
