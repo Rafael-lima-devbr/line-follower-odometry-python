@@ -19,7 +19,7 @@ from line_functions import (
 )
 import time
 
-base_speed = 30
+base_speed = 25
 last_position = 0
 
 runtime = CommsRuntime(
@@ -32,7 +32,8 @@ motor_r = runtime.traction("98:3D:AE:43:50:50")
 motor_l = runtime.traction("10:20:BA:AA:E7:28")
 line_sensor = runtime.line_sensor("10:20:BA:AC:F4:B0")
 distance_sensor = runtime.distance_sensor("7C:4F:AD:79:B0:44")
-color_sensor = runtime.color_sensor("7C:4F:AD:79:94:B0")
+color_sensor_r = runtime.color_sensor("7C:4F:AD:79:94:B0")
+color_sensor_l = runtime.color_sensor("Serial_Number")
 
 motors = Motors(right = motor_r, left = motor_l)
 
@@ -41,7 +42,9 @@ odometry = Odometry()
 
 try:
     while True:
-        reading = line_sensor.get_data()
+        reading = line_sensor.get_position()
+        color_r = color_sensor_r.get_color()
+        color_l = color_sensor_l.get_color()
         update_odometry_motors(odometry, motors)
 
         if reading["line_detected"]:
