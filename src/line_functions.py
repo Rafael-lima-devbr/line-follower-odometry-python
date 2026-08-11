@@ -7,6 +7,14 @@ def is_clear_intersection(digital):
 def is_left_90_candidate(digital):
     return digital[0] and digital[1] and not digital[3] and not digital[4]
 
+def is_180(color_r, color_l):
+    return color_r == "green" and color_l == "green"
+
+def is_color_90_left(color_r, color_l):
+    return color_r != "green" and color_l == "green"
+
+def is_color_90_right(color_r, color_l):
+    return color_r == "green" and color_l != "green"
 
 def is_right_90_candidate(digital):
     return digital[3] and digital[4] and not digital[0] and not digital[1]
@@ -16,8 +24,11 @@ def is_gap(reading):
     return not reading["line_detected"]
 
 def update_odometry_motors(odometry, motors):
-    right_deg = motors.right.get_position_telemetry()
-    left_deg = motors.left.get_position_telemetry()
+    right_data = motors.right.get_position_telemetry()
+    left_data = motors.left.get_position_telemetry()
+
+    right_deg = right_data["position_deg"]
+    left_deg = left_data["position_deg"]
 
     odometry.update(right_deg, left_deg)
 
@@ -31,7 +42,7 @@ def turn_right(motors, odometry, target_angle_rad):
 
         update_odometry_motors(odometry, motors)
 
-        turned_angle = odometry.angle_difference(odometry.theta, start_theta)
+        turned_angle = odometry.angle_difference_rad(odometry.theta, start_theta)
 
         if turned_angle >= target_angle_rad:
             break
@@ -50,7 +61,7 @@ def turn_left(motors, odometry, target_angle_rad):
 
         update_odometry_motors(odometry, motors)
 
-        turned_angle = odometry.angle_difference(odometry.theta, start_theta)
+        turned_angle = odometry.angle_difference_rad(odometry.theta, start_theta)
 
         if turned_angle <= -target_angle_rad:
             break
@@ -189,7 +200,7 @@ def handle_lost_line(motors, line_sensor, last_position, odometry):
 
         time.sleep(0.01)
 
-def handle_obstacle(motors, line_sensor, odometry):
+def handle_obstacle(motors, odometry):
     motors.stop()
     time.sleep(0.2)
 
@@ -206,3 +217,17 @@ def handle_obstacle(motors, line_sensor, odometry):
 
     turn_right(motors, odometry, math.radians(90))
     time.sleep(0.1)
+
+def handle_180(motors, odometry):
+    motors.stop()
+    turn_right(motors, odometry, math.radians(180))
+
+def handle_color_90_left(motors, odometry):
+    motors.stop()
+    turn_left(motors, odometry, math.radians(90))
+    move_straight_for(motors, odometry, 0.2, 30)
+
+def handle_color_90_right(motors, odometry):
+    motors.stop()
+    turn_right(motors, odometry, math.radians(90))
+    move_straight_for(motors, odometry, 0.2, 30)
