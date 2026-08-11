@@ -7,10 +7,13 @@ The robot uses a line sensor, PID control, motor movement, and odometry to follo
 ## Project Structure
 
 ```text
-follow-line/
+line-follower-odometry-python/
 ├── scripts/
-│   ├── calibrate_sensor.py
-│   └── test_sensor.py
+│   ├── calibrate_line_sensor.py
+│   ├── get_devices.py
+│   ├── remote_control.py
+│   ├── test_line_sensor.py
+│   └── walk_straight.py
 │
 ├── src/
 │   ├── main.py
@@ -39,7 +42,7 @@ Contains the logic used to estimate the robot's position and rotation based on w
 
 ### `line_functions.py`
 
-Contains helper functions for line detection and special track situations, such as:
+Contains helper functions related to line detection and special track situations, such as:
 
 * Intersections
 * Line gaps
@@ -48,13 +51,25 @@ Contains helper functions for line detection and special track situations, such 
 
 ## Scripts
 
-### `calibrate_sensors.py`
+### `calibrate_line_sensor.py`
 
 Used to calibrate the line sensor before running the robot.
 
-### `test_sensor.py`
+### `get_devices.py`
 
-Used to test sensor readings separately from the main robot program.
+Lists the devices detected by the Open-RDK `CommsRuntime`.
+
+### `remote_control.py`
+
+Allows manual control of the robot motors using keyboard commands.
+
+### `test_line_sensor.py`
+
+Used to check line sensor readings separately from the main robot program.
+
+### `walk_straight.py`
+
+Used to test straight movement independently from the main control logic.
 
 ## Current Features
 
@@ -79,7 +94,7 @@ git clone https://github.com/Rafael-lima-devbr/line-follower-odometry-python.git
 Enter the project folder:
 
 ```bash
-cd follow-line
+cd line-follower-odometry-python
 ```
 
 Run the main file:
@@ -95,13 +110,31 @@ The robot hardware and Open-RDK modules must be configured before running the pr
 Calibrate the line sensor:
 
 ```bash
-python scripts/calibrate_sensors.py
+python scripts/calibrate_line_sensor.py
 ```
 
-Test the sensor readings:
+List connected devices:
 
 ```bash
-python scripts/test_sensor.py
+python scripts/get_devices.py
+```
+
+Test the line sensor:
+
+```bash
+python scripts/test_line_sensor.py
+```
+
+Control the motors manually:
+
+```bash
+python scripts/remote_control.py
+```
+
+Test straight movement:
+
+```bash
+python scripts/walk_straight.py
 ```
 
 ## Status
