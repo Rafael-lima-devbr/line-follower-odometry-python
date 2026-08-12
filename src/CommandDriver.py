@@ -18,7 +18,7 @@ class LatestCommandDriver:
 
     def set_speed(self, value):
         with self._lock:
-            self._pending = value
+            self._pending = -value
         self._wake.set()
 
     def _run(self):
