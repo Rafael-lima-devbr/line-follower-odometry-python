@@ -31,7 +31,7 @@ def update_odometry_motors(odometry, motors):
 
     odometry.update(right_deg, left_deg)
 
-def turn_right(driver_r, driver_l, motors, odometry, target_angle_rad):
+def turn_left(driver_r, driver_l, motors, odometry, target_angle_rad):
     update_odometry_motors(odometry, motors)
     start_theta = odometry.theta
 
@@ -51,7 +51,7 @@ def turn_right(driver_r, driver_l, motors, odometry, target_angle_rad):
     driver_r.stop()
     driver_l.stop()
 
-def turn_left(driver_r, driver_l, motors, odometry, target_angle_rad):
+def turn_right(driver_r, driver_l, motors, odometry, target_angle_rad):
     update_odometry_motors(odometry, motors)
     start_theta = odometry.theta
 
