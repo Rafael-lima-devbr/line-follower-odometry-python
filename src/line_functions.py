@@ -8,13 +8,13 @@ def is_left_90_candidate(digital):
     return digital[0] and digital[1] and not digital[3] and not digital[4]
 
 def is_180(color_r, color_l):
-    return color_r == "green" and color_l == "green"
+    return color_r in ("503nm", "552nm", "528nm") and color_l in ("503nm", "552nm", "528nm")
 
 def is_color_90_left(color_r, color_l):
-    return color_r != "green" and color_l == "green"
+    return color_r not in ("503nm", "552nm", "528nm") and color_l in ("503nm", "552nm", "528nm")
 
 def is_color_90_right(color_r, color_l):
-    return color_r == "green" and color_l != "green"
+    return color_r in ("503nm", "552nm", "528nm") and color_l not in ("503nm", "552nm", "528nm")
 
 def is_right_90_candidate(digital):
     return digital[3] and digital[4] and not digital[0] and not digital[1]
