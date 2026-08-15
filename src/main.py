@@ -16,6 +16,7 @@ from line_functions import (
     handle_color_90_left,
     handle_color_90_right,
     handle_180,
+    handle_color_marking,
     handle_intersection,
     handle_lost_line,
     handle_obstacle,
@@ -69,19 +70,17 @@ try:
             handle_obstacle(driver_r, driver_l, motors, odometry)
             continue
 
-        if color_marking == "180":
-            handle_180(driver_r, driver_l, motors, odometry)
-            continue
-
-        if color_marking == "LEFT":
-            handle_color_90_left(driver_r, driver_l, motors, odometry)
-            continue
-
-        if color_marking == "RIGHT":
-            handle_color_90_right(driver_r, driver_l, motors, odometry)
+        if handle_color_marking(color_marking, driver_r, driver_l, motors, odometry):
             continue
 
         if is_clear_intersection(digital):
+            move_straight_for(driver_r, driver_l, motors, odometry, 0.15, 30)
+
+            color_marking = detect_color_marking(color_sensor_r, color_sensor_l)
+
+            if handle_color_marking(color_marking, driver_r, driver_l, motors, odometry):
+                continue
+
             handle_intersection(driver_r, driver_l, motors, odometry)
             continue
 
