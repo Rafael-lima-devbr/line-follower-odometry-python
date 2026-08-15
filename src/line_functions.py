@@ -1,20 +1,48 @@
 import time
 import math
 
+GREEN_VALUES = ("503nm", "552nm", "528nm")
+
 def is_clear_intersection(digital):
     return all(digital)
 
 def is_left_90_candidate(digital):
     return digital[0] and digital[1] and not digital[3] and not digital[4]
 
-def is_180(color_r, color_l):
-    return color_r in ("503nm", "552nm", "528nm") and color_l in ("503nm", "552nm", "528nm")
+def is_green(color):
+    return color in GREEN_VALUES
 
-def is_color_90_left(color_r, color_l):
-    return color_r not in ("503nm", "552nm", "528nm") and color_l in ("503nm", "552nm", "528nm")
+def detect_color_marking(color_sensor_r, color_sensor_l, duration=0.15):
+    start_time = time.monotonic()
 
-def is_color_90_right(color_r, color_l):
-    return color_r in ("503nm", "552nm", "528nm") and color_l not in ("503nm", "552nm", "528nm")
+    right_green_count = 0
+    left_green_count = 0
+
+    while time.monotonic() - start_time < duration:
+        color_r = color_sensor_r.get_color()
+        color_l = color_sensor_l.get_color()
+
+        if is_green(color_r):
+            right_green_count += 1
+
+        if is_green(color_l):
+            left_green_count += 1
+
+        time.sleep(0.01)
+
+    right_confirmed = right_green_count >= 2
+    left_confirmed = left_green_count >= 2
+
+    if right_confirmed and left_confirmed:
+        return "180"
+
+    if left_confirmed and not right_confirmed:
+        return "LEFT"
+
+    if right_confirmed and not left_confirmed:
+        return "RIGHT"
+
+    return None
 
 def is_right_90_candidate(digital):
     return digital[3] and digital[4] and not digital[0] and not digital[1]
