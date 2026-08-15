@@ -2,9 +2,9 @@ import time
 
 class PID:
     def __init__ (self):
-        self.kp = 0
+        self.kp = 100
         self.ki = 0
-        self.kd = 0
+        self.kd = 0.1
         self.last_error = None
         self.integral = 0
         self.last_time = None
