@@ -8,10 +8,9 @@ from line_functions import (
     is_left_90_candidate,
     is_right_90_candidate,
     is_gap,
+    is_green,
     is_obstacle,
-    is_180,
-    is_color_90_left,
-    is_color_90_right,
+    detect_color_marking,
     handle_left_candidate,
     handle_right_candidate,
     handle_color_90_left,
@@ -26,7 +25,7 @@ from line_functions import (
 )
 import time
 
-base_speed = 25
+BASE_SPEED = 25
 last_position = 0
 
 runtime = CommsRuntime(
@@ -53,28 +52,32 @@ odometry = Odometry()
 try:
     while True:
         reading = line_sensor.get_data()
+        digital = reading["digital"]
+        update_odometry_motors(odometry, motors)
         color_r = color_sensor_r.get_color()
         color_l = color_sensor_l.get_color()
-        update_odometry_motors(odometry, motors)
+
+        if is_green(color_r) or is_green(color_l):
+            color_marking = detect_color_marking(color_sensor_r, color_sensor_l)
+        else:
+            color_marking = None
 
         if reading["line_detected"]:
             last_position = reading["position"]
-
-        digital = reading["digital"]
 
         if is_obstacle(distance_sensor):
             handle_obstacle(driver_r, driver_l, motors, odometry)
             continue
 
-        if is_180(color_r, color_l):
+        if color_marking == "180":
             handle_180(driver_r, driver_l, motors, odometry)
             continue
 
-        if is_color_90_left(color_r, color_l):
+        if color_marking == "LEFT":
             handle_color_90_left(driver_r, driver_l, motors, odometry)
             continue
 
-        if is_color_90_right(color_r, color_l):
+        if color_marking == "RIGHT":
             handle_color_90_right(driver_r, driver_l, motors, odometry)
             continue
 
@@ -98,7 +101,7 @@ try:
 
             continue
 
-        follow_line(driver_r, driver_l, reading, pid, base_speed)
+        follow_line(driver_r, driver_l, reading, pid, BASE_SPEED)
 
 finally:
     driver_r.stop()
