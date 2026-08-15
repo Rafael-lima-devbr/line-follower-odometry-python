@@ -25,7 +25,7 @@ class PID:
                 self.integral += error * dt
 
         result = self.kp * error + self.ki * self.integral + self.kd * derivative
-        result = max(-20, min(20, result))
+        result = max(-100, min(100, result))
         self.last_time = now
         self.last_error = error
         return result
