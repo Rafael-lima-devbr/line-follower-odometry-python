@@ -155,6 +155,21 @@ def handle_right_candidate(driver_r, driver_l, motors, line_sensor, odometry):
     else:
         turn_right(driver_r, driver_l, motors, odometry, math.radians(90))
 
+def handle_color_marking(color_marking, driver_r, driver_l, motors, odometry):
+    if color_marking == "180":
+        handle_180(driver_r, driver_l, motors, odometry)
+        return True
+
+    if color_marking == "LEFT":
+        handle_color_90_left(driver_r, driver_l, motors, odometry)
+        return True
+
+    if color_marking == "RIGHT":
+        handle_color_90_right(driver_r, driver_l, motors, odometry)
+        return True
+
+    return False
+
 def follow_line(driver_r, driver_l, reading, pid, base_speed):
     position = reading["position"]
 
