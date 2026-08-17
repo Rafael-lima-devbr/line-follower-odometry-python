@@ -175,8 +175,8 @@ def follow_line(driver_r, driver_l, reading, pid, base_speed):
 
     correction = pid.calculate(position)
 
-    left_speed = base_speed - correction
-    right_speed = base_speed + correction
+    left_speed = base_speed + correction
+    right_speed = base_speed - correction
 
     left_speed = max(-50, min(50, left_speed))
     right_speed = max(-50, min(50, right_speed))
