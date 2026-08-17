@@ -20,6 +20,7 @@ from line_functions import (
     handle_intersection,
     handle_lost_line,
     handle_obstacle,
+    move_straight_for,
     try_cross_gap,
     update_odometry_motors,
     follow_line,
