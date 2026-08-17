@@ -27,8 +27,8 @@ from line_functions import (
 )
 import time
 
-BASE_SPEED = 25
-last_position = 0
+BASE_SPEED = 15.0
+last_position = 0.0
 
 runtime = CommsRuntime(
     auto_start=True,
