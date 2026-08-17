@@ -1,7 +1,7 @@
 import time
 import math
 
-GREEN_VALUES = ("503nm", "552nm", "528nm")
+GREEN_VALUES = ("green", "cyan")
 
 def is_clear_intersection(digital):
     return all(digital)
