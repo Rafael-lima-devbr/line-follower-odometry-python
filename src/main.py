@@ -76,6 +76,7 @@ try:
 
         if is_clear_intersection(digital):
             move_straight_for(driver_r, driver_l, motors, odometry, 0.15, 30)
+            color_marking = detect_color_marking(color_sensor_r, color_sensor_l)
 
             if handle_color_marking(color_marking, driver_r, driver_l, motors, odometry):
                 continue
