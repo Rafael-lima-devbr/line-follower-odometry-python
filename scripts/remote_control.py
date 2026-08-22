@@ -3,8 +3,8 @@ from openrdk import Motors
 import time
 
 VELOCIDADE_MAX = 60
-PASSO = 5
-TEMPO_ACELERACAO = 0.4
+PASSO = 2.5
+TEMPO_ACELERACAO = 0.1
 
 runtime = CommsRuntime(
     auto_start=True,
