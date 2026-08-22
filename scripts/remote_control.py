@@ -4,7 +4,7 @@ import time
 
 VELOCIDADE_MAX = 60
 PASSO = 5
-TEMPO_ACELERACAO = 0.1
+TEMPO_ACELERACAO = 0.4
 
 runtime = CommsRuntime(
     auto_start=True,
